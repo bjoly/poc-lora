@@ -30,12 +30,14 @@ const int SX1272_debug_mode=2;
 #include <WaspFrame.h>
 
 /***   NETWORKING PARAMETERS    ***/
+
 /*---NODE TRANSMISSION SCHEDULE---*/
-#define TX_SCHEDULE "00:00:00:00"   
+#define TX_SCHEDULE "00:00:00:00"
+
 /*---NODE ADDRESS---*/
-#define NODE_ADDR 8
-char nodeID[] = "node_08";
-#define WASP_ID "RAD08"
+#define NODE_ADDR 9
+char nodeID[] = "node_09";
+#define WASP_ID "RAD09"
 #define MESHLIUM_ADDR 1
 
 
@@ -46,6 +48,8 @@ char nodeID[] = "node_08";
 
 #define RAD_CNT_TIME 30000  //radiation counting time (ms)
 
+/* Deep sleep period between each loop */
+char const * const SLEEP_PERIOD = "00:00:00:05";
 
 // status variable for GPS connection
 bool status;
@@ -94,8 +98,8 @@ void loop()
     //delay(1000);
   //}
   //while(cnt_time<TX_PERIOD);  //return to sleep until the required numbers of alarms is reached  
-  
-  PWR.deepSleep("00:00:05:00",RTC_OFFSET,RTC_ALM1_MODE1,ALL_OFF);  //wake up in 4 min
+  USB.println("Starting loop");
+  PWR.deepSleep(SLEEP_PERIOD, RTC_OFFSET,RTC_ALM1_MODE1, ALL_OFF);  //wake up in 4 min
   //PWR.deepSleep(TX_SCHEDULE,RTC_ABSOLUTE,RTC_ALM1_MODE5,ALL_OFF);  //wake up the next time sec="00"
   
   
