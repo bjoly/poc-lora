@@ -33,10 +33,9 @@ const int SX1272_debug_mode=2;
 
 /***   NETWORKING PARAMETERS    ***/
 
-/*---NODE TRANSMISSION SCHEDULE---*/
-#define TX_SCHEDULE "00:00:00:00"
-
 /*---NODE ADDRESS---*/
+// TODO use common variables
+// see https://gist.github.com/AndersonChoi/1810053b038c41bce212e53efb3e76b9/
 #define NODE_ADDR 9
 char nodeID[] = "node_09";
 #define WASP_ID "RAD09"
@@ -48,9 +47,6 @@ char nodeID[] = "node_09";
 #define GPS_PERIOD 24  //the GPS is read every GPS_PERIOD iterations of loop()
 
 #define RAD_CNT_TIME 30000  //radiation counting time (ms)
-
-/* Deep sleep period between each loop */
-char const * const SLEEP_PERIOD = "00:00:00:05";
 
 /**
  * Initialize Libelium Plug&Sense
@@ -69,14 +65,13 @@ void setup()
 
   // Setting fake time [yy:mm:dd:dow:hh:mm:ss]
   RTC.setTime("16:01:01:05:00:00:00");
-
-  // set alarm
-  //RTC.setAlarm1(TX_SCHEDULE,RTC_ABSOLUTE,RTC_ALM1_MODE5); //mode5: seconds match
-
 }
 
 void loop()
 {
+  // Deep sleep period between each loop
+  char const * const SLEEP_PERIOD = "00:00:00:05";
+
   int gps_cycle_count=0;
 
   // Sleep, wake up at scheduled time
