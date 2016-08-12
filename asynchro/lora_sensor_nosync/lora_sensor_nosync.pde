@@ -25,6 +25,7 @@
 
 const int SX1272_debug_mode=2;
 
+// Waspmote api headers
 #include <WaspFrame.h>
 #include <WaspGPS.h>
 #include "WaspSensorRadiation.h"
@@ -43,7 +44,6 @@ char nodeID[] = "node_09";
 
 
 /***   TIMING PARAMETERS    ***/
-#define TX_PERIOD 6   //time between successive (measurements+transmissions) (in minutes or hour depending on RTC_ALM_MODE)
 #define GPS_TIMEOUT 2  //GPS timeout in s
 #define GPS_PERIOD 24  //the GPS is read every GPS_PERIOD iterations of loop()
 
@@ -52,20 +52,9 @@ char nodeID[] = "node_09";
 /* Deep sleep period between each loop */
 char const * const SLEEP_PERIOD = "00:00:00:05";
 
-// status variable for GPS connection
-bool status;
-
-float radiation;
-
-// state variables
-int cycle_cnt=0;
-bool first_cycle=true;
-
-// status variable
-int8_t e;
-
-int8_t cnt_time=0;
-
+/**
+ * Initialize Libelium Plug&Sense
+ */
 void setup()
 {
   // open USB port
@@ -88,6 +77,8 @@ void setup()
 
 void loop()
 {
+  int gps_cycle_count=0;
+
   // Sleep, wake up at scheduled time
   USB.println("Starting loop");
   PWR.deepSleep(SLEEP_PERIOD, RTC_OFFSET,RTC_ALM1_MODE1, ALL_OFF);  //wake up in 4 min
@@ -96,7 +87,7 @@ void loop()
   // Measure radiation level
   RadiationBoard.ON();
   delay(2000); //stabilisation delay
-  radiation = RadiationBoard.getCPM(RAD_CNT_TIME);
+  float radiation = RadiationBoard.getCPM(RAD_CNT_TIME);
   USB.println("radiation:");
   USB.println(radiation);
 
@@ -118,13 +109,13 @@ void loop()
   frame.addSensor(SENSOR_RAD,radiation);
 
   // Get GPS (periodically)
-  if((cycle_cnt % GPS_PERIOD)==0)
+  if((gps_cycle_count % GPS_PERIOD)==0)
   {
-    cycle_cnt=0;
+    gps_cycle_count=0;
     // Set GPS ON
     GPS.ON();
     USB.println(F("wait for GPS signal"));
-    status = GPS.waitForSignal(GPS_TIMEOUT);
+    bool status = GPS.waitForSignal(GPS_TIMEOUT);
     if( status == true )
     {
       USB.println(F("\n----------------------"));
@@ -158,7 +149,7 @@ void loop()
   USB.println(frame.length,DEC);
   frame.showFrame();
   init_sx1272();
-  e = sx1272.sendPacketTimeoutACK(MESHLIUM_ADDR, frame.buffer, frame.length );
+  int8_t e = sx1272.sendPacketTimeoutACK(MESHLIUM_ADDR, frame.buffer, frame.length );
   // if ACK was received check signal strength
   if( e == 0 )
   {
@@ -187,7 +178,7 @@ void loop()
   USB.println();
   USB.println();
 
-  cycle_cnt++;
+  gps_cycle_count++;
 }
 
 void init_sx1272()
@@ -203,7 +194,7 @@ void init_sx1272()
   delay(2000);
 
   // Select frequency channel
-  e = sx1272.setChannel(CH_12_868);
+  int8_t e = sx1272.setChannel(CH_12_868);
   USB.print(F("Setting Channel CH_12_868.\t state "));
   USB.println(e);
 
