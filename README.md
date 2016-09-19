@@ -1,2 +1,7 @@
 # poc-lora
-proof of concept LoRa 
+
+Proof of concept LoRa
+
+# Pre-requisites
+
+Install WaspLogging library: https://github.com/fjammes/WaspLogging 
